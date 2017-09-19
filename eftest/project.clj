@@ -7,5 +7,4 @@
                  [org.clojure/tools.namespace "0.2.11"]
                  [progrock "0.1.2"]
                  [io.aviso/pretty "0.1.33"]
-                 [mvxcvi/puget "1.0.1"]
-                 [org.javassist/javassist "3.21.0-GA"]])
+                 [mvxcvi/puget "1.0.1"]])
