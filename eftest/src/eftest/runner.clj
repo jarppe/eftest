@@ -4,7 +4,8 @@
             [clojure.test :as test]
             [clojure.tools.namespace.find :as find]
             [eftest.report :as report]
-            [eftest.report.progress :as progress]))
+            [eftest.report.progress :as progress]
+            [eftest.output-capture :as capture]))
 
 (defmethod test/report :begin-test-run [_])
 
@@ -18,15 +19,23 @@
 (defn- test-vars [ns vars opts]
   (let [once-fixtures (-> ns meta ::test/once-fixtures test/join-fixtures)
         each-fixtures (-> ns meta ::test/each-fixtures test/join-fixtures)
+        capture-context (capture/init-capture)
         report        (synchronize test/report)
-        test-var      (fn [v] (binding [test/report report] (test/test-var v)))]
+        test-var      (fn [v]
+                        (capture/begin-capture)
+                        (binding [test/report report
+                                  test/*test-out* *out*
+                                  *out* (:captured-writer capture-context)
+                                  *err* (:captured-writer capture-context)]
+                          (test/test-var v)))]
     (once-fixtures
      (fn []
        (if (:multithread? opts true)
          (let [test (bound-fn [v] (each-fixtures #(test-var v)))]
            (dorun (->> vars (filter synchronized?) (map test)))
            (dorun (->> vars (remove synchronized?) (pmap test))))
-         (doseq [v vars] (each-fixtures #(test-var v))))))))
+         (doseq [v vars] (each-fixtures #(test-var v))))))
+    (capture/restore-capture capture-context)))
 
 (defn- test-ns [ns vars opts]
   (let [ns (the-ns ns)]
