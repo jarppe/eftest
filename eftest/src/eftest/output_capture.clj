@@ -3,8 +3,6 @@
            (java.nio.charset StandardCharsets)
            (javassist.util.proxy ProxyFactory MethodFilter MethodHandler)))
 
-(set! *warn-on-reflection* true)
-
 (def captured-output-contexts (atom {}))
 
 (defn thread-id []
