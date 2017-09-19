@@ -5,7 +5,7 @@
             [leiningen.core.project :as project]))
 
 (def eftest-profile
-  {:dependencies '[[eftest "0.3.2-SNAPSHOT"]]})
+  {:dependencies '[[eftest "0.3.1"]]})
 
 (defn- report-namespace [project]
   (-> project :eftest (:report 'eftest.report.progress/report) namespace symbol))
